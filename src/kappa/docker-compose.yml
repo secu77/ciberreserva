@@ -1,0 +1,48 @@
+version: '3'
+services:
+  cbms:
+    build: .
+    environment:
+      MYSQL_HOST: mysql
+      MYSQL_DATABASE: cbms
+      MYSQL_USER: cb
+      MYSQL_PASSWORD: cbP@ssw0rd
+    ports:
+      - "8188:80"
+    volumes:
+      - ./cbms:/var/www/html
+    networks:
+      - apps
+  fmanager:
+    build: .
+    environment:
+      MYSQL_HOST: mysql
+      MYSQL_DATABASE: fmanager
+      MYSQL_USER: cb
+      MYSQL_PASSWORD: cbP@ssw0rd
+    ports:
+      - "8189:80"
+    volumes:
+      - ./fmanager:/var/www/html
+    networks:
+      - apps
+  mysql:
+    image: mysql:5.7
+    environment:
+      MYSQL_ROOT_PASSWORD: KlIsMaRthKINsoMEN
+    ports:
+      - "3306"
+    volumes:
+      - ./mysql/dump.sql:/docker-entrypoint-initdb.d/dump.sql
+    networks:
+      - apps
+networks:
+  apps:
+    driver: "bridge"
+volumes:
+  mysqldata:
+    driver: "local"
+  cbms:
+    driver: "local"
+  fmanager:
+    driver: "local"

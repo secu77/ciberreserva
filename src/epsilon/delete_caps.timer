@@ -1,0 +1,10 @@
+[Unit]
+Description=Que no sigas buscando por aqui
+
+[Timer]
+OnCalendar=*-*-* *:00/1:01
+Persistent=true
+Unit=delete_caps.service
+
+[Install]
+WantedBy=timers.target

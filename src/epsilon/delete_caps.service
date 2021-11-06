@@ -1,0 +1,9 @@
+[Unit]
+Description=Porque estas viendo esto?
+
+[Service]
+Type=simple
+ExecStart=/etc/systemd/system/delete_caps.sh
+
+[Install]
+WantedBy=default.target
