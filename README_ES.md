@@ -56,7 +56,7 @@ Al ejecutar la herramienta se genera un reporte en distintos formatos en el cual
 |:----------: |
 | Credenciales de dominio descubiertas de Benito Antoñanzas con Fozar |
 
-## First intrusion in OMEGA = Primer acceso a OMEGA? (duda)
+## Primer acceso a OMEGA
 
 Se puede pensar que, el usuario Benito Antoñanzas, estaba probando los scripts de PowerShell y, al hacer un commit se olvidó que había dejado sus credenciales en el script y luego las borró en el siguiente commit.
 
