@@ -6,7 +6,40 @@
 
 ## Index
 
-[[_TOC_]]
+- [**VPN Access**](#vpn-access)
+- [**OSINT and perimeter reconnaissance**](#osint-and-perimeter-reconnaissance)
+  - [Getting Benito Antoñanzas domain credentials from a Github commit](#getting-benito-antoñanzas-domain-credentials-from-a-github-commit)
+- [**First intrusion in OMEGA**](#first-intrusion-in-omega)
+  - [Accessing OWA with domain credentials of Benito Antoñanzas](#accessing-owa-with-domain-credentials-of-benito-antoñanzas)
+  - [Internal Spearphishing Attachment and compromise of user Angel Rubio](#internal-spearphishing-attachment-and-compromise-of-user-angel-rubio)
+  - [Domain Recon with Bloodhound](#domain-recon-with-bloodhound)
+  - [Socks Proxy with web shell in XAMPP Server](#socks-proxy-with-web-shell-in-xampp-server)
+  - [Getting Angel Rubio's domain credentials from a NET Assembly](#getting-angel-rubios-domain-credentials-from-a-net-assembly)
+  - [Accessing OWA with Angel Rubio's domain credentials](#accessing-owa-with-angel-rubios-domain-credentials)
+- [**First steps on KAPPA**](#first-steps-on-kappa)
+  - [Union Based SQL Injection in Web service](#union-based-sql-injection-in-web-service)
+  - [Arbitrary File Upload in IIS Web service](#arbitrary-file-upload-in-iis-web-service)
+  - [Privilege Elevation leveraging SeImpersonate Privilege with EfsPotato](#privilege-elevation-leveraging-seimpersonate-privilege-with-efspotato)
+  - [Domain Reconnaissance with Bloodhound](#domain-reconnaissance-with-bloodhound)
+  - [Using ReadLAPS permission with KAPPA$ in OMEGA](#using-readlaps-permission-with-kappa-in-omega)
+- [**Lateral movement to OMEGA**](#lateral-movement-to-omega)
+  - [Obtaining Cesar Gandia's credentials from scheduled tasks](obtaining-cesar-gandias-credentials-from-scheduled-tasks)
+- [**Arriving at EPSILON**](#arriving-at-epsilon)
+  - [Lateral Movement to EPSILON via SSH with Cesar Gandia's credentials](#lateral-movement-to-epsilon-via-ssh-with-cesar-gandias-credentials)
+  - [EPSILON characterization and analysis of the Admintool binary with SUID bit](#epsilon-characterization-and-analysis-of-the-admintool-binary-with-suid-bit)
+  - [Exploitation of Admintool binary and Elevation of Privileges with CAP_SETUID](#exploitation-of-admintool-binary-and-elevation-of-privileges-with-cap_setuid)
+  - [Discovering TGT of Alicia Sierra and Ticket Exporting](#discovering-tgt-of-alicia-sierra-and-ticket-exporting)
+- [**Lateral Movement to SIGMA**](#lateral-movement-to-sigma)
+  - [Pass the Ticket with TGT of Alicia Sierra](#pass-the-ticket-with-tgt-of-alicia-sierra)
+  - [Reset Password for user Luis Prieto with Alicia Sierra Impersonation](#reset-password-for-user-luis-prieto-with-alicia-sierra-impersonation)
+  - [SIGMA engagement leveraging ReadLAPS using the Luis Prieto user](sigma-engagement-leveraging-readalaps-using-the-luis-prieto-user)
+- [**Accessing SIGMA**](#accessing-sigma)
+  - [Discovering Kerberos Unconstrained Delegation](#discovering-kerberos-unconstrained-delegation)
+  - [Exploiting Kerberos Delegation and getting TGT from ZETA$ using PrinterBug](#exploiting-kerberos-delegation-and-getting-tgt-from-zeta-using-printerbug)
+  - [Pass The Ticket as ZETA$ and DCsync](#pass-the-ticket-as-zeta-and-dcsync)
+- [**The crown jewel ZETA**](#the-crown-jewel-zeta)
+- [**The Last Bastion, LAMBDA**](#the-last-bastion-lambda)
+  - [Pass The Hash with Luis Tamayo's hash to LAMBDA](#pass-the-hash-with-luis-tamayos-hash-to-lambda)
 
 ## VPN Access
 
@@ -94,7 +127,7 @@ The user's mailbox is accessed using his credentials.
 
 Following a study of the emails sent and received, it is clear that the compromised user submitted reports to the user Angel Rubio. The emails' attachments are "doc" and "xls" office documents. This information shows that internal Spearphishing can allow compromising this person.
 
-This attack requires downloading one of the files sent by Benito Antoanzas. The document is modified, and a macro containing injected VBA code. This macro will download and run an EXE file from the C:Windows Tasks directory.
+This attack requires downloading one of the files sent by Benito Antoanzas. The document is modified, and a macro containing injected VBA code. This macro will download and run an EXE file from the `C:\Windows\Tasks` directory.
 
 
 The downloaded file is a loader that executes a Cobaltstrike beacon shellcode. A Shellcode Execution with Native Windows Functions technique allows bypassing any defensive measures on the computer.
@@ -145,7 +178,11 @@ Subsequently, we change the document to be emailed and create the macro that wil
 
 This macro will run a command in Powershell that will download the Cobalt Beacon loader and execute it. It is not the most elegant and stealthy option, but it's enough to bypass endpoint defenses.
 
-To generate the base64-encoded PowerShell command, you can do it with: `echo 'POWERSHELL_CODE_HERE' | iconv --to-code UTF-16LE | base64 -w 0`
+To generate the base64-encoded PowerShell command, you can do it with: 
+
+```sh
+echo 'POWERSHELL_CODE_HERE' | iconv --to-code UTF-16LE | base64 -w 0
+```
 
 | ![Image 12](images/12.png) |
 |:----------: |
@@ -217,7 +254,11 @@ To do this, simply clone the project from Github, modify the PHP agent, and uplo
 |:----------: |
 | Modifying Pivotnacci PHP agent that will be uploaded to the XAMPP web directory |
 
-Then run the python script `pivotnacci.py`, which will start a Socks Server on the attacker's machine. It can be used with proxychains to access web services that could not be accessed from the VPN: `pivotnacci http://192. 168.56.110:8001/dashboard/info.php --password "c1b3rr353rv4" -A 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.169 Safari/537.36' -v`
+Then run the python script **pivotnacci.py**, which will start a Socks Server on the attacker's machine. It can be used with proxychains to access web services that could not be accessed from the VPN: 
+
+```sh
+pivotnacci http://192. 168.56.110:8001/dashboard/info.php --password "c1b3rr353rv4" -A 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.169 Safari/537.36' -v
+```
 
 | ![Image 21](images/21.png) |
 |:----------: |
@@ -232,13 +273,13 @@ However, before we continue exploring the possibilities that Pivotnacci provides
 |:----------: |
 | Mail of interest sent by Angel Rubio to Benito Antoñanzas |
 
-In this email, Angel Rubio mentions software that communicates with the Exchange server. He also includes his credentials, which are hardcoded. The hint is obvious. In OMEGA, he examines the C:ExchangeCli directory and discovers a binary called "ExchangeCli.exe." This malware is downloaded to the attacker's system for laboratory analysis.
+In this email, Angel Rubio mentions software that communicates with the Exchange server. He also includes his credentials, which are hardcoded. The hint is obvious. In OMEGA, he examines the `C:\ExchangeCli` directory and discovers a binary called "ExchangeCli.exe." This malware is downloaded to the attacker's system for laboratory analysis.
 
 | ![Image 23](images/23.png) |
 |:----------: |
 | Discovering and downloading ExchangeCli.exe binary on OMEGA |
 
-While examining the binary, we discover that it is a NET Assembly. Therefore, when developed in.NET, the source code is converted to CIL (intermediate language code). This allows the source code to be decompiled and obtained. The tool [ILSpy] (https://github.com/icsharpcode/ILSpy) is used to do this. And, after examining the source code (which is not corrupted), users may see Angel Rubio's dominion credentials.
+While examining the binary, we discover that it is a NET Assembly. Therefore, when developed in.NET, the source code is converted to CIL (intermediate language code). This allows the source code to be decompiled and obtained. The tool [ILSpy](https://github.com/icsharpcode/ILSpy) is used to do this. And, after examining the source code (which is not corrupted), users may see Angel Rubio's dominion credentials.
 
 | ![Image 24](images/24.png) |
 |:----------: |
@@ -362,11 +403,11 @@ In the administrative section of the "File Manager" you can see that the only fu
 |:----------: |
 | Uploading PHP web shell at http://kappa.ciberreserva.com |
 
-It has already been verified that the webserver is a Microsoft-IIS/10.0 and that the user with which the web shell commands are executed is "NT AUTHORITYIUSR."
+It has already been verified that the webserver is a Microsoft-IIS/10.0 and that the user with which the web shell commands are executed is `NT AUTHORITY\IUSR`.
 
 ### Privilege Elevation leveraging SeImpersonate Privilege with EfsPotato
 
-Listing this user's privileges reveals that they have the SeImpersonate privilege. This suggests that this token can be used to elevate privileges to "NT AUTHORITY SYSTEM."
+Listing this user's privileges reveals that they have the SeImpersonate privilege. This suggests that this token can be used to elevate privileges to `NT AUTHORITY\SYSTEM`.
 
 | ![Image 42](images/42.png) |
 |:----------: |
@@ -390,13 +431,13 @@ Running this binary will create a namedpipe in KAPPA that can be connected to fr
 |:----------: |
 | Connecting to KAPPA's NamedPipe from OMEGA's Beacon |
 
-Once the link to the NamedPipe is made, you will receive a Beacon as "NT AUTHORITY SYSTEM" in KAPPA.
+Once the link to the NamedPipe is made, you will receive a Beacon as `NT AUTHORITY\SYSTEM` in KAPPA.
 
 | ![Image 46](images/46.png) |
 |:----------: |
 | Receiving Beacon from KAPPA with the user "NT AUTHORITY SYSTEM" |
 
-With the Beacon of "NT AUTHORITY SYSTEM" on KAPPA, we access the root flag:
+With the Beacon of `NT AUTHORITY\SYSTEM` on KAPPA, we access the root flag:
 
 | ![Image 138](images/138.png) |
 |:----------: |
@@ -404,19 +445,21 @@ With the Beacon of "NT AUTHORITY SYSTEM" on KAPPA, we access the root flag:
 
 ### Domain Reconnaissance with Bloodhound
 
-At this point, if you have done a good analysis of the information collected with Sharphound, you can see how the KAPPA machine account (KAPPA$) has the ReadLAPS permission on OMEGA.
+At this point, if you have done a good analysis of the information collected with Sharphound, you can see how the KAPPA machine account (`KAPPA$`) has the ReadLAPS permission on OMEGA.
 
 | ![Image 146](images/146.png) |
 |:----------: |
 | Discovering KAPPA$'s ReadLAPS on OMEGA with Bloodhound |
 
-Following the discovery of this permission, we continue to acquire the properties of the OMEGA$ domain object from the Beacon using the KAPPA$ user "NT AUTHORITY SYSTEM.". To do so, we can check that KAPPA has the Powershell ActiveDirectory module installed. Taking advantage of this resource, we can execute the following command: `PowerShell Get-AdComputer -Identity "OMEGA" -Properties *`.
+### Using ReadLAPS permission with KAPPA$ in OMEGA
+
+Following the discovery of this permission, we continue to acquire the properties of the `OMEGA$` domain object from the Beacon using the `KAPPA$` user `NT AUTHORITY\SYSTEM`. To do so, we can check that KAPPA has the Powershell ActiveDirectory module installed. Taking advantage of this resource, we can execute the following command: `PowerShell Get-AdComputer -Identity "OMEGA" -Properties *`.
 
 | ![Image 48](images/48.png) |
 |:----------: |
 | Getting the properties of the OMEGA domain object from KAPPA |
 
-When utilizing the Beacon with the KAPPA user "NT AUTHORITY SYSTEM," the "ms-Mcs-AdmPwd" property of OMEGA is read, which contains the password of the OMEGA's Local Administrator in cleartext. This is because the KAPPA machine account (KAPPA$) has the ReadLAPS permission on OMEGA, and we are KAPPA$ network-wide by utilizing "NT AUTHORITY SYSTEM."
+When utilizing the Beacon with the KAPPA user `NT AUTHORITY\SYSTEM`, the "ms-Mcs-AdmPwd" property of OMEGA is read, which contains the password of the OMEGA's Local Administrator in cleartext. This is because the KAPPA machine account (`KAPPA$`) has the ReadLAPS permission on OMEGA, and we are `KAPPA$` network-wide by utilizing `NT AUTHORITY\SYSTEM`.
 
 | ![Image 49](images/49.png) |
 |:----------: |
@@ -432,15 +475,15 @@ The easiest way to do this from CobaltStrike is to use the "Spawn As" functional
 |:----------: |
 | Using CobaltStrike's Spawn As with the OMEGA Administrator credentials |
 
-Once the Spawn As is executed, a CobaltStrike Beacon is received as "OMEGA "Administrator" on the OMEGA machine.
+Once the Spawn As is executed, a CobaltStrike Beacon is received as "OMEGA\Administrator" on the OMEGA machine.
 
 | ![Image 51](images/51.png) |
 |:----------: |
-| Receiving Beacon from OMEGA with the user "OMEGA "Administrator" |
+| Receiving Beacon from OMEGA with the user "OMEGA\Administrator" |
 
-| Getting Cesar Gandia's credentials from scheduled tasks
+### Obtaining Cesar Gandia's credentials from scheduled tasks
 
-After landing on OMEGA and performing some post-exploitation tasks, we found several scheduled tasks in "C:\Windows\System32\Tasks".
+After landing on OMEGA and performing some post-exploitation tasks, we found several scheduled tasks in `C:\Windows\System32\Tasks`.
 
 | ![Image 52](images/52.png) |
 |:----------: |
@@ -790,11 +833,17 @@ By consulting the possibilities of lateral movement in Bloodhound, with the user
 |:----------: |
 | Discovering with Bloodhound that Alicia Sierra has the ACL "ForceChangePassword" on Luis Prieto |
 
-To abuse this permission, we load the Powerview module in the Cobaltstrike Beacon and, taking advantage of the Pass The Ticket, we successfully change Luis Prieto's password with the following command: `$UserPassword = ConvertTo-SecureString 'Password123!' -AsPlainText -Force ; Set-DomainUserPassword -Identity ciberreserva\lprieto -AccountPassword $UserPassword`
+To abuse this permission, we load the Powerview module in the Cobaltstrike Beacon and, taking advantage of the Pass The Ticket, we successfully change Luis Prieto's password with the following command: 
+
+```powershell
+$UserPassword = ConvertTo-SecureString 'Password123!' -AsPlainText -Force ; Set-DomainUserPassword -Identity ciberreserva\lprieto -AccountPassword $UserPassword
+```
 
 | ![Image 121](images/121.png) |
 |:----------: |
 | Luis Prieto's Password Reset using PowerView |
+
+### SIGMA engagement leveraging ReadLAPS using the Luis Prieto user
 
 This password change is not random. If you investigate the available scope using the user Luis Prieto, you discover that this user has the ReadLAPS permission on the SIGMA machine.
 
@@ -802,7 +851,11 @@ This password change is not random. If you investigate the available scope using
 |:----------: |
 | Discovering with Bloodhound that Luis Prieto has the ReadLAPS permission on SIGMA |
 
-Since we don't have the Active Directory module, and for a change, we will use the [ldapsearch](https://linux.die.net/man/1/ldapsearch) tool through the pivotnacci tunnel to exploit the ReadLAPS permission. For this, simply provide the user's credentials to Ldapsearch and request the properties of the domain object "SIGMA$": `proxychains4 ldapsearch -H ldap://zeta.cyberreserva.com -x -D "lprieto@ciberreserva.com" -w "Password123!" -b "dc=ciberreserva,dc=com" "(sAMAccountName=sigma$)"`
+Since we don't have the Active Directory module, and for a change, we will use the [ldapsearch](https://linux.die.net/man/1/ldapsearch) tool through the pivotnacci tunnel to exploit the ReadLAPS permission. For this, simply provide the user's credentials to Ldapsearch and request the properties of the domain object "SIGMA$": 
+
+```sh
+proxychains4 ldapsearch -H ldap://zeta.cyberreserva.com -x -D "lprieto@ciberreserva.com" -w "Password123!" -b "dc=ciberreserva,dc=com" "(sAMAccountName=sigma$)"
+```
 
 | ![Image 123](images/123.png) |
 |:----------: |
@@ -810,7 +863,7 @@ Since we don't have the Active Directory module, and for a change, we will use t
 
 | ![Image 124](images/124.png) |
 |:----------: |
-| | Getting ms-Mcs-AdmPwd from SIGMA |
+| Getting ms-Mcs-AdmPwd from SIGMA |
 
 ## Accessing SIGMA
 
@@ -864,7 +917,7 @@ To do this, first decode the TGT obtained with Rubeus, which will be in kirbi fo
 
 | ![Image 130](images/130.png) |
 |:----------: |
-| Decoding the ZETA$ TGT obtained with Rubeus !
+| Decoding the ZETA$ TGT obtained with Rubeus |
 
 | ![Imagen 131](images/131.png) |
 |:----------: |
