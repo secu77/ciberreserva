@@ -6,7 +6,40 @@
 
 ## Index
 
-[[_TOC_]]
+- [**Acceso VPN**](#acceso-vpn)
+- [**OSINT y reconocimiento perimetral**](#osint-y-reconocimiento-perimetral)
+  - [Obtención de las credenciales de dominio de Benito Antoñanzas de un commit de GitHub](#obtención-de-las-credenciales-de-dominio-de-benito-antoñanzas-de-un-commit-de-github)
+- [**Primer acceso a OMEGA**](#primer-acceso-a-omega)
+  - [Acceso al OWA con credenciales de dominio de Benito Antoñanzas](#acceso-al-owa-con-credenciales-de-dominio-de-benito-antoñanzas)
+  - [Internal Spearphishing Attachment and compromise of user Angel Rubio](#internal-spearphishing-attachment-and-compromise-of-user-angel-rubio)
+  - [Reconocimiento del dominio con Bloodhound](#reconocimiento-del-dominio-con-bloodhound)
+  - [Socks Proxy con webshell en servidor XAMPP](#socks-proxy-con-webshell-en-servidor-xampp)
+  - [Obtención de las credenciales de dominio de Angel Rubio a partir de un NET Assembly](#obtención-de-las-credenciales-de-dominio-de-angel-rubio-a-partir-de-un-net-assembly)
+  - [Acceso al OWA con credenciales del dominio de Angel Rubio](#acceso-al-owa-con-credenciales-del-dominio-de-angel-rubio)
+- [**Primeros pasos en KAPPA**](#primeros-pasos-en-kappa)
+  - [Union Based SQL Injection en servicio web](#union-based-sql-injection-en-servicio-web)
+  - [Arbitrary File Upload en servicio web IIS](#arbitrary-file-upload-en-servicio-web-iis)
+  - [Elevación de privilegios aprovechando SeImpersonate Privilege con EfsPotato](#elevación-de-privilegios-aprovechando-seimpersonate-privilege-con-efspotato)
+  - [Reconocimiento del dominio con Bloodhound](#reconocimiento-del-dominio-con-bloodhound-1)
+  - [Utilización del permiso ReadLAPS con KAPPA$ en OMEGA](#utilización-del-permiso-readlaps-con-kappa-en-omega)
+- [**Movimiento Lateral a OMEGA**](#movimiento-lateral-a-omega)
+  - [Obtención de las credenciales de Cesar Gandía a partir de tareas programadas](#obtención-de-las-credenciales-de-cesar-gandía-a-partir-de-tareas-programadas)
+- [**Llegada a EPSILON**](#llegada-a-epsilon)
+  - [Movimiento lateral a EPSILON mediante SSH con las credenciales de Cesar Gandia](#movimiento-lateral-a-epsilon-mediante-ssh-con-las-credenciales-de-cesar-gandia)
+  - [Caracterización de EPSILON y análisis del binario Admintool con SUID bit](#caracterización-de-epsilon-y-análisis-del-binario-admintool-con-suid-bit)
+  - [Explotación del binario Admintool y elevación con CAP_SETUID](#explotación-del-binario-admintool-y-elevación-con-cap_setuid)
+  - [Descubrimiento del TGT de Alicia Sierra y exportación de tickets](#descubrimiento-del-tgt-de-alicia-sierra-y-exportación-de-tickets)
+- [**Movimiento lateral a SIGMA**](#movimiento-lateral-a-sigma)
+  - [Pass the Ticket con TGT de Alicia Sierra](#pass-the-ticket-con-tgt-de-alicia-sierra)
+  - [Reseteo de contraseña del usuario Luis Prieto impersonando al usuario Alicia Sierra](#reseteo-de-contraseña-del-usuario-luis-prieto-impersonando-al-usuario-alicia-sierra)
+  - [Compromiso de SIGMA aprovechando ReadLAPS usando el usuario de Luis Prieto](#compromiso-de-sigma-aprovechando-readlaps-usando-el-usuario-de-luis-prieto)
+- [**Acceso a SIGMA**](#acceso-a-sigma)
+  - [Descubrimiento de Kerberos Unconstrained Delegation](descubrimiento-de-kerberos-unconstrained-delegation)
+  - [Explotación de Kerberos Delegation y obtención de TGT de ZETA$ usando PrinterBug](#explotación-de-kerberos-delegation-y-obtención-de-tgt-de-zeta-usando-printerbug)
+  - [Pass The Ticket como ZETA$ y DCsync](#pass-the-ticket-como-zeta-y-dcsync)
+- [**La joya de la corona Zeta**](#la-joya-de-la-corona-zeta)
+- [**El ultimo bastion LAMBDA**](#el-último-bastion-lambda)
+  - [Pass The Hash con el hash de Luis Tamayo a LAMBDA](#pass-the-hash-con-el-hash-de-luis-tamayo-a-lambda)
 
 ## Acceso VPN
 
@@ -48,8 +81,8 @@ Otra forma de hacer esto es utilizando la herramienta [Fozar](https://github.com
 
 | ![Imagen 5](images/5.png) |
 |:----------: |
-
 | Ejecutando Fozar para buscar credenciales en los repositorios de Benito Antoñanzas |
+
 Al ejecutar la herramienta se genera un reporte en distintos formatos en el cual, para este caso, se puede ver cómo se obtienen las credenciales de dominio de la misma forma.
 
 | ![Imagen 6](images/6.png) |
@@ -131,7 +164,12 @@ Después de esto, se procede a editar el documento a enviar, se crea la macro qu
 | Creando Macro en el documento ofimático |
 
 Esta macro ejecutará un comando en PowerShell que se descargará el cargador del Beacon de Cobalt y lo ejecutará. No es la opción más elegante y stealthy, pero para evadir las defensas del endpoint será suficiente.
-Para generar el comando powershell codificado en base64, se puede hacer con: `echo 'POWERSHELL_CODE_HERE' | iconv --to-code UTF-16LE | base64 -w 0`
+
+Para generar el comando powershell codificado en base64, se puede hacer con: 
+
+```sh
+echo 'POWERSHELL_CODE_HERE' | iconv --to-code UTF-16LE | base64 -w 0
+```
 
 | ![Imagen 12](images/12.png) |
 |:----------: |
@@ -202,7 +240,11 @@ Para hacerlo, simplemente se clona el proyecto de Github, se modifica el agente 
 |:----------: |
 | Modificando agente PHP de Pivotnacci que será subido al directorio del XAMPP |
 
-Posteriormente se ejecuta el script en python pivotnacci.py que levantará un Servidor Socks en la máquina del atacante el cual se puede utilizar con proxychains para acceder a servicios web que desde la VPN no se podía: `pivotnacci http://192.168.56.110:8001/dashboard/info.php --password "c1b3rr353rv4" -A 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.169 Safari/537.36' -v`
+Posteriormente se ejecuta el script en python pivotnacci.py que levantará un Servidor Socks en la máquina del atacante el cual se puede utilizar con proxychains para acceder a servicios web que desde la VPN no se podía: 
+
+```sh
+pivotnacci http://192.168.56.110:8001/dashboard/info.php --password "c1b3rr353rv4" -A 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.169 Safari/537.36' -v
+```
 
 | ![Imagen 21](images/21.png) |
 |:----------: |
@@ -400,7 +442,7 @@ Una vez descubierto este permiso, se procede a obtener las propiedades del objet
 |:----------: |
 | Obteniendo las propiedades del objeto de dominio OMEGA desde KAPPA |
 
-Al utilizar el Beacon con el usuario "NT AUTHORITY\SYSTEM" desde KAPPA, se consigue leer la propiedad "ms-Mcs-AdmPwd" de OMEGA, que contiene la contraseña en plano del Administrador Local de OMEGA. Esto sucede debido a que la cuenta de máquina de KAPPA (KAPPA$) tiene el permiso ReadLAPS sobre OMEGA y, al utilizar "NT AUTHORITY\SYSTEM", de cara a red, somos KAPPA$.
+Al utilizar el Beacon con el usuario "NT AUTHORITY\SYSTEM" desde KAPPA, se consigue leer la propiedad "ms-Mcs-AdmPwd" de OMEGA, que contiene la contraseña en plano del Administrador Local de OMEGA. Esto sucede debido a que la cuenta de máquina de KAPPA (`KAPPA$`) tiene el permiso ReadLAPS sobre OMEGA y, al utilizar "NT AUTHORITY\SYSTEM", de cara a red, somos `KAPPA$`.
 
 | ![Imagen 49](images/49.png) |
 |:----------: |
@@ -769,7 +811,11 @@ Consultando las posibilidades que se tienen de movimiento lateral en Bloodhound,
 |:----------: |
 | Descubriendo con Bloodhound que Alicia Sierra tiene la ACL "ForceChangePassword" sobre Luis Prieto |
 
-Para abusar de este permiso, se procede a cargar el módulo de Powerview en el Beacon de CobaltStrike y, aprovechando el Pass The Ticket se consigue realizar un cambio de contraseña de Luis Prieto exitoso con el siguiente comando: `$UserPassword = ConvertTo-SecureString 'Password123!' -AsPlainText -Force ; Set-DomainUserPassword -Identity ciberreserva\lprieto -AccountPassword $UserPassword`
+Para abusar de este permiso, se procede a cargar el módulo de Powerview en el Beacon de CobaltStrike y, aprovechando el Pass The Ticket se consigue realizar un cambio de contraseña de Luis Prieto exitoso con el siguiente comando: 
+
+```powershell
+$UserPassword = ConvertTo-SecureString 'Password123!' -AsPlainText -Force ; Set-DomainUserPassword -Identity ciberreserva\lprieto -AccountPassword $UserPassword
+```
 
 | ![Imagen 121](images/121.png) |
 |:----------: |
@@ -783,7 +829,11 @@ Este cambio de contraseña no es aleatorio. Si se investiga el alcance disponibl
 |:----------: |
 | Descubriendo con Bloodhound que Luis Prieto tiene el permiso ReadLAPS sobre SIGMA |
 
-Al no disponer del módulo de Active Directory, y por variar un poco, se utilizará la herramienta [ldapsearch](https://linux.die.net/man/1/ldapsearch) a través del túnel de pivotnacci para conseguir explotar el permiso ReadLAPS. Para esto, simplemente se tienen que proporcionar las credenciales del usuario a Ldapsearch y solicitar las propiedades del objeto de dominio "SIGMA$": `proxychains4 ldapsearch -H ldap://zeta.ciberreserva.com -x -D "lprieto@ciberreserva.com" -w "Password123!" -b "dc=ciberreserva,dc=com" "(sAMAccountName=sigma$)"`
+Al no disponer del módulo de Active Directory, y por variar un poco, se utilizará la herramienta [ldapsearch](https://linux.die.net/man/1/ldapsearch) a través del túnel de pivotnacci para conseguir explotar el permiso ReadLAPS. Para esto, simplemente se tienen que proporcionar las credenciales del usuario a Ldapsearch y solicitar las propiedades del objeto de dominio `SIGMA$`: 
+
+```sh
+proxychains4 ldapsearch -H ldap://zeta.ciberreserva.com -x -D "lprieto@ciberreserva.com" -w "Password123!" -b "dc=ciberreserva,dc=com" "(sAMAccountName=sigma$)"
+```
 
 | ![Imagen 123](images/123.png) |
 |:----------: |
@@ -830,8 +880,8 @@ Tras realizar una caracterización de la máquina, se puede comprobar que la má
 Con el nivel de privilegios que se dispone y la configuración de la máquina, se plantea una posible vía de compromiso del dominio que consiste en lo siguiente:
 
 - Se ejecuta Rubeus con el usuario "NT AUTHORITY\SYSTEM" en SIGMA, monitorizando los TGTs de la máquina.
-- Desde SIGMA, se fuerza a la cuenta de máquina de ZETA (ZETA$), a autenticarse en SIGMA utilizando la vulnerabilidad de [PrinterBug](https://github.com/leechristensen/SpoolSample).
-- Al autenticarse ZETA en SIGMA, como la máquina tiene configurada la Unconstrained Delegation de Kerberos, ZETA$ dejará su TGT en la máquina, que será capturado por el Rubeus.
+- Desde SIGMA, se fuerza a la cuenta de máquina de ZETA (`ZETA$`), a autenticarse en SIGMA utilizando la vulnerabilidad de [PrinterBug](https://github.com/leechristensen/SpoolSample).
+- Al autenticarse ZETA en SIGMA, como la máquina tiene configurada la Unconstrained Delegation de Kerberos, `ZETA$` dejará su TGT en la máquina, que será capturado por el Rubeus.
 - Con ese TGT, se puede impersonar a ZETA y conseguir escalar en el dominio.
 
 | ![Imagen 129](images/129.png) |
@@ -840,7 +890,7 @@ Con el nivel de privilegios que se dispone y la configuración de la máquina, s
 
 ### Pass The Ticket como ZETA$ y DCsync
 
-Con el TGT de la cuenta de máquina de ZETA (ZETA$), se puede realizar un Pass The Ticket, impersonar a ZETA y realizar así un Dcsync para obtener las credenciales de un Administrador de Dominio.
+Con el TGT de la cuenta de máquina de ZETA (`ZETA$`), se puede realizar un Pass The Ticket, impersonar a ZETA y realizar así un Dcsync para obtener las credenciales de un Administrador de Dominio.
 Para poder realizar esto, primero se decodifica el TGT obtenido con Rubeus, que estará en formato kirbi y se podrá importar desde CobaltStrike.
 
 | ![Imagen 130](images/130.png) |
