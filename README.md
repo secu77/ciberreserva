@@ -24,7 +24,7 @@ I want to thank the people who have helped in the development of this challenge 
 
 - [Mussu](https://twitter.com/0xmussu) and [MrP](https://twitter.com/_mrp314) for helping me design and build the Active Directory machines. Without them the challenge would never have seen the light.
 - To [Etnum](https://twitter.com/the_etnum) for helping me with the Writeup and his infinite patience.
-- To [Rocio](https://twitter.com/macacosgelados) for helping me with the Writeup translations.
+- To Rocio for helping me with the Writeup translations.
 - To [Jari](https://twitter.com/_Laox) and [Atlas](https://twitter.com/DaniLJ94) for testing the challenge, validating that everything was working correctly and discovering some bugs (;
 - To L for giving me a hand with the infrastructure issues
 - To [Heksiah](https://twitter.com/Heksiah) for those fantastic designs of La CiberReserva.
